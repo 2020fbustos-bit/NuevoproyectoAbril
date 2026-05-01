@@ -22,7 +22,7 @@ export const TacticsPage = () => {
     if (ctx) {
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      ctx.lineWidth = 3; // Thin brush requested
+      ctx.lineWidth = 1.5; // Thin brush requested
     }
   }, []);
 
@@ -110,7 +110,7 @@ export const TacticsPage = () => {
       </div>
 
       {/* The Court */}
-      <div className="flex-1 mx-4 sm:mx-8 mb-8 relative rounded-3xl overflow-hidden border-8 border-surface shadow-2xl bg-gradient-to-b from-[#2E5E32] to-[#1B3B22]">
+      <div className="flex-1 mx-0 sm:mx-0 mb-0 mt-2 relative rounded-t-3xl overflow-hidden border-t-8 border-surface shadow-2xl bg-gradient-to-b from-[#2E5E32] to-[#1B3B22]">
          
          {/* CSS Court Lines Background */}
          <div className="absolute inset-0 pointer-events-none opacity-40">

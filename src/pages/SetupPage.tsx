@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useAppStore, type UserAuth, type Role } from '../store/useAppStore';
 import { Settings, Save, ShieldAlert, KeyRound, UserPlus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const SetupPage = () => {
+  const navigate = useNavigate();
   const teamName = useAppStore(state => state.teamName);
   const setTeamName = useAppStore(state => state.setTeamName);
   const users = useAppStore(state => state.users);
@@ -18,7 +20,10 @@ export const SetupPage = () => {
   const [linkedPlayerId, setLinkedPlayerId] = useState('');
 
   const handleSaveTeam = () => {
-    if (localName) setTeamName(localName);
+    if (localName) {
+      setTeamName(localName);
+      navigate('/');
+    }
   };
 
   const handleCreateUser = () => {

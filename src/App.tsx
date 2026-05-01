@@ -37,8 +37,9 @@ import { MatchesPage } from './pages/MatchesPage';
 import { TacticsPage } from './pages/TacticsPage';
 import { LoginPage } from './pages/LoginPage';
 import { SetupPage } from './pages/SetupPage';
+import { TrainingPage } from './pages/TrainingPage';
 import { useAppStore } from './store/useAppStore';
-import { Settings, LogOut } from 'lucide-react';
+import { Settings, LogOut, Swords } from 'lucide-react';
 
 function App() {
   const currentUser = useAppStore(state => state.currentUser);
@@ -65,15 +66,17 @@ function App() {
             <Route path="/players" element={isAdmin ? <PlayersPage /> : <div className="text-center p-20 text-white">Vista restringida solo para perfil personal (En progreso)</div>} />
             <Route path="/tactics" element={<TacticsPage />} />
             <Route path="/matches" element={isAdmin ? <MatchesPage /> : <div className="text-center p-20 text-white">Modo Lectura Activo. Esperando actualizaciones.</div>} />
+            <Route path="/training" element={isAdmin ? <TrainingPage /> : <div className="text-center p-20 text-white">Solo Coaches.</div>} />
             {isAdmin && <Route path="/setup" element={<SetupPage />} />}
           </Routes>
         </main>
         
-        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 pb-safe px-6 py-2 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] rounded-t-3xl">
+        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 pb-safe px-2 sm:px-6 py-2 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] rounded-t-3xl">
            <div className="flex justify-between items-center max-w-4xl mx-auto">
              <NavLink to="/" icon={Home} label="Home" />
              {isAdmin && <NavLink to="/players" icon={Users} label="Fichas" />}
              {isAdmin && <NavLink to="/tactics" icon={LayoutDashboard} label="Pizarra" />}
+             {isAdmin && <NavLink to="/training" icon={Swords} label="Entrenar" />}
              <NavLink to="/matches" icon={CalendarDays} label="Partidos" />
            </div>
         </nav>
