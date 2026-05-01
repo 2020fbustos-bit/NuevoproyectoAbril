@@ -25,8 +25,11 @@ export type Player = {
   emergencyContactName: string;
   emergencyContactPhone: string;
   allergies: string;
+  preferredClinic: string;
   trainingDays: string[];
   isActive: boolean;
+  activationDate?: string;
+  deactivationDate?: string;
 };
 
 // Match module
@@ -87,6 +90,7 @@ interface AppState {
   addPlayer: (player: Omit<Player, 'id'>) => string;
   updatePlayer: (id: string, player: Partial<Player>) => void;
   deletePlayer: (id: string) => void;
+  updateUserAuth: (playerId: string, role: Role, pass: string) => void;
   saveMatch: (match: Omit<Match, 'id'>) => void;
   saveTraining: (t: Omit<TrainingMatch, 'id'>) => void;
   logAttendance: (dateStr: string, playerIds: string[]) => void;
@@ -122,7 +126,13 @@ export const useAppStore = create<AppState>()(
 
       addPlayer: (playerData) => {
         const id = crypto.randomUUID();
-        set((state) => ({ players: [...state.players, { ...playerData, id }] }));
+        const rutSanitized = playerData.rut.replace(/[\.\-]/g, '');
+        const defaultPass = rutSanitized.slice(-4) || '1234'; // last 4 digits of RUT
+        
+        set((state) => ({ 
+           players: [...state.players, { ...playerData, id }],
+           users: [...state.users, { id, role: 'jugadora', email: rutSanitized, pass: defaultPass }]
+        }));
         return id;
       },
       updatePlayer: (id, playerData) => set((state) => ({
@@ -130,9 +140,19 @@ export const useAppStore = create<AppState>()(
       })),
       deletePlayer: (id) => set((state) => ({
         players: state.players.filter(p => p.id !== id),
-        // Cascading deletes would optionally drop them from users if role: jugadora
         users: state.users.filter(u => u.id !== id)
       })),
+      updateUserAuth: (playerId, role, pass) => set((state) => {
+         const existingUser = state.users.find(u => u.id === playerId);
+         const player = state.players.find(p => p.id === playerId);
+         if (existingUser) {
+            return { users: state.users.map(u => u.id === playerId ? { ...u, role, pass } : u) };
+         } else if (player) {
+            const rutSanitized = player.rut.replace(/[\.\-]/g, '');
+            return { users: [...state.users, { id: playerId, role, email: rutSanitized, pass }] };
+         }
+         return state;
+      }),
       saveMatch: (matchData) => set((state) => ({
         matches: [{ ...matchData, id: crypto.randomUUID() }, ...state.matches]
       })),

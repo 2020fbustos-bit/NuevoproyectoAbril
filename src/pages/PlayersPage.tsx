@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { AddPlayerModal } from '../components/AddPlayerModal';
-import { UserPlus, ChevronRight, ShieldAlert } from 'lucide-react';
+import { UserPlus, ChevronRight, ShieldAlert, Save, Key, UserCog, Calendar } from 'lucide-react';
 
 export const PlayersPage = () => {
   const players = useAppStore(state => state.players);
@@ -59,36 +59,12 @@ export const PlayersPage = () => {
                   </button>
                 </div>
 
-                {/* Expanded Details Form */}
-                {isExpanded && (
-                  <div className="mt-4 pt-4 border-t border-white/10 text-sm space-y-3 animate-in slide-in-from-top-2">
-                     <div className="grid grid-cols-2 gap-2">
-                       <div>
-                         <p className="text-white/40 text-[10px] uppercase font-black">Posición</p>
-                         <p className="text-white font-medium">{player.position}</p>
-                       </div>
-                       <div>
-                         <p className="text-white/40 text-[10px] uppercase font-black">RUT</p>
-                         <p className="text-white font-medium">{player.rut}</p>
-                       </div>
-                       <div>
-                         <p className="text-white/40 text-[10px] uppercase font-black">Celular</p>
-                         <p className="text-white font-medium">{player.phone || 'N/A'}</p>
-                       </div>
-                       <div>
-                         <p className="text-white/40 text-[10px] uppercase font-black">Email</p>
-                         <p className="text-white font-medium truncate">{player.email || 'N/A'}</p>
-                       </div>
-                     </div>
-                     <div className="bg-orange-500/10 p-3 rounded-lg border border-orange-500/20">
-                         <p className="text-orange-500/70 text-[10px] uppercase font-black">Alérgia Médica</p>
-                         <p className="text-white font-medium">{player.allergies || 'Ninguna descrita'}</p>
-                         
-                         <p className="text-orange-500/70 text-[10px] uppercase font-black mt-2">Emergencia</p>
-                         <p className="text-white font-medium">{player.emergencyContactName} ({player.emergencyContactPhone})</p>
-                     </div>
-                  </div>
-                )}
+                 {/* Expanded Details Form */}
+                 {isExpanded && (
+                   <div className="mt-4 pt-4 border-t border-white/10 text-sm space-y-3 animate-in slide-in-from-top-2" onClick={e => e.stopPropagation()}>
+                      <PlayerEditor player={player} onClose={() => setExpandedPlayerId(null)} />
+                   </div>
+                 )}
               </div>
             );
           })}
@@ -107,3 +83,95 @@ export const PlayersPage = () => {
     </div>
   );
 };
+
+const PlayerEditor = ({ player, onClose }: { player: any, onClose: () => void }) => {
+  const updatePlayer = useAppStore(state => state.updatePlayer);
+  const updateUserAuth = useAppStore(state => state.updateUserAuth);
+  const users = useAppStore(state => state.users);
+  
+  const [formData, setFormData] = useState(player);
+  
+  const userAuth = users.find(u => u.id === player.id) || { role: 'jugadora', pass: '1234' };
+  const [role, setRole] = useState(userAuth.role);
+  const [pass, setPass] = useState(userAuth.pass);
+
+  const handleSave = () => {
+    updatePlayer(player.id, formData);
+    updateUserAuth(player.id, role, pass);
+    onClose();
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3">
+         <div>
+            <label className="text-[10px] font-bold text-white/50 uppercase">Posición</label>
+            <input type="text" value={formData.position} onChange={e => setFormData({...formData, position: e.target.value})} className="w-full bg-background border border-white/10 rounded-lg px-2 py-1.5 text-white focus:border-primary outline-none" />
+         </div>
+         <div>
+            <label className="text-[10px] font-bold text-white/50 uppercase">Celular</label>
+            <input type="text" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full bg-background border border-white/10 rounded-lg px-2 py-1.5 text-white focus:border-primary outline-none" />
+         </div>
+      </div>
+      
+      <div className="bg-orange-500/10 p-3 rounded-lg border border-orange-500/20 space-y-2">
+         <p className="text-orange-500/70 text-[10px] uppercase font-black flex items-center gap-1"><ShieldAlert size={12}/> Info Médica y Emergencia</p>
+         <div>
+            <label className="text-[10px] font-bold text-orange-200/50 uppercase">Clínica de Preferencia</label>
+            <input type="text" value={formData.preferredClinic || ''} onChange={e => setFormData({...formData, preferredClinic: e.target.value})} className="w-full bg-background border border-orange-500/30 rounded-lg px-2 py-1.5 text-white focus:border-orange-500 outline-none" placeholder="Indisa, Alemana, etc." />
+         </div>
+         <div>
+            <label className="text-[10px] font-bold text-orange-200/50 uppercase">Alergias</label>
+            <input type="text" value={formData.allergies} onChange={e => setFormData({...formData, allergies: e.target.value})} className="w-full bg-background border border-orange-500/30 rounded-lg px-2 py-1.5 text-white focus:border-orange-500 outline-none" />
+         </div>
+         <div className="grid grid-cols-2 gap-2">
+           <div>
+              <label className="text-[10px] font-bold text-orange-200/50 uppercase">Contacto</label>
+              <input type="text" value={formData.emergencyContactName} onChange={e => setFormData({...formData, emergencyContactName: e.target.value})} className="w-full bg-background border border-orange-500/30 rounded-lg px-2 py-1.5 text-white focus:border-orange-500 outline-none" />
+           </div>
+           <div>
+              <label className="text-[10px] font-bold text-orange-200/50 uppercase">Teléfono Contacto</label>
+              <input type="text" value={formData.emergencyContactPhone} onChange={e => setFormData({...formData, emergencyContactPhone: e.target.value})} className="w-full bg-background border border-orange-500/30 rounded-lg px-2 py-1.5 text-white focus:border-orange-500 outline-none" />
+           </div>
+         </div>
+      </div>
+
+      <div className="bg-blue-500/10 p-3 rounded-lg border border-blue-500/20 space-y-2">
+         <p className="text-blue-500/70 text-[10px] uppercase font-black flex items-center gap-1"><Calendar size={12}/> Tiempos de Activación</p>
+         <div className="grid grid-cols-2 gap-2">
+           <div>
+              <label className="text-[10px] font-bold text-blue-200/50 uppercase">Fecha Activación</label>
+              <input type="date" value={formData.activationDate || ''} onChange={e => setFormData({...formData, activationDate: e.target.value})} className="w-full bg-background border border-blue-500/30 rounded-lg px-2 py-1.5 text-white focus:border-blue-500 outline-none" />
+           </div>
+           <div>
+              <label className="text-[10px] font-bold text-blue-200/50 uppercase">Fecha Desactivación</label>
+              <input type="date" value={formData.deactivationDate || ''} onChange={e => setFormData({...formData, deactivationDate: e.target.value})} className="w-full bg-background border border-blue-500/30 rounded-lg px-2 py-1.5 text-white focus:border-blue-500 outline-none" />
+           </div>
+         </div>
+      </div>
+
+      <div className="bg-purple-500/10 p-3 rounded-lg border border-purple-500/20 space-y-2">
+         <p className="text-purple-500/70 text-[10px] uppercase font-black flex items-center gap-1"><Key size={12}/> Acceso a la App</p>
+         <p className="text-white/50 text-[10px] mb-2">Usuario: <span className="font-bold text-white">{player.rut.replace(/[\.\-]/g, '')}</span></p>
+         <div className="grid grid-cols-2 gap-2">
+           <div>
+              <label className="text-[10px] font-bold text-purple-200/50 uppercase">Perfil</label>
+              <select value={role} onChange={e => setRole(e.target.value as any)} className="w-full bg-background border border-purple-500/30 rounded-lg px-2 py-1.5 text-white focus:border-purple-500 outline-none">
+                 <option value="jugadora">Jugadora</option>
+                 <option value="admin">Administradora</option>
+              </select>
+           </div>
+           <div>
+              <label className="text-[10px] font-bold text-purple-200/50 uppercase">Clave (4 dígitos)</label>
+              <input type="text" maxLength={4} value={pass} onChange={e => setPass(e.target.value)} className="w-full bg-background border border-purple-500/30 rounded-lg px-2 py-1.5 text-white focus:border-purple-500 outline-none" placeholder="1234" />
+           </div>
+         </div>
+      </div>
+
+      <button onClick={handleSave} className="w-full py-2 bg-primary text-background font-bold uppercase rounded-lg shadow-md hover:bg-primary/90 flex items-center justify-center gap-2">
+         <Save size={16} /> Guardar Ficha
+      </button>
+    </div>
+  );
+};
+

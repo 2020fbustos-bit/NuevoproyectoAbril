@@ -18,7 +18,10 @@ export const AddPlayerModal = ({ onClose }: { onClose: () => void }) => {
     emergencyContactName: '',
     emergencyContactPhone: '',
     allergies: '',
+    preferredClinic: '',
     trainingDays: [],
+    activationDate: new Date().toISOString().split('T')[0],
+    deactivationDate: '',
   });
 
   const handleDaySelect = (day: string) => {
@@ -113,6 +116,30 @@ export const AddPlayerModal = ({ onClose }: { onClose: () => void }) => {
                       <input type="tel" value={formData.emergencyContactPhone} onChange={e => setFormData({...formData, emergencyContactPhone: e.target.value})} className="w-full mt-1 bg-slate-900 border border-orange-500/30 rounded-xl p-3 text-white focus:border-orange-500 outline-none" placeholder="Celular" />
                    </div>
                  </div>
+                 <div>
+                    <label className="text-xs font-semibold text-orange-200/70 uppercase">Clínica de Preferencia</label>
+                    <input type="text" value={formData.preferredClinic} onChange={e => setFormData({...formData, preferredClinic: e.target.value})} className="w-full mt-1 bg-slate-900 border border-orange-500/30 rounded-xl p-3 text-white focus:border-orange-500 outline-none" placeholder="Clínica Alemana, Indisa, etc." />
+                 </div>
+             </div>
+          </div>
+
+          <hr className="border-slate-800" />
+
+          {/* Fechas de Activación */}
+          <div className="space-y-4">
+             <h3 className="text-sm font-bold text-slate-300 flex items-center gap-2">
+                <Calendar className="text-primary" size={16} /> 
+                Estado en el Club
+             </h3>
+             <div className="grid grid-cols-2 gap-3">
+               <div>
+                  <label className="text-xs font-semibold text-slate-400 uppercase">F. Activación</label>
+                  <input type="date" value={formData.activationDate} onChange={e => setFormData({...formData, activationDate: e.target.value})} className="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:border-primary outline-none" />
+               </div>
+               <div>
+                  <label className="text-xs font-semibold text-slate-400 uppercase">F. Desactivación</label>
+                  <input type="date" value={formData.deactivationDate} onChange={e => setFormData({...formData, deactivationDate: e.target.value})} className="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:border-primary outline-none" />
+               </div>
              </div>
           </div>
 

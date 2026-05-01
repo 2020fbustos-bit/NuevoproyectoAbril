@@ -4,7 +4,8 @@ import { Eraser, Trash2, PenTool } from 'lucide-react';
 export const TacticsPage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [color, setColor] = useState('#FFFFFF'); // Default White
+  const [color, setColor] = useState('#FFFFFF'); // Default White or 'eraser'
+  const [lineWidth, setLineWidth] = useState(2);
   
   // Set up canvas layout on load
   useEffect(() => {
@@ -56,7 +57,16 @@ export const TacticsPage = () => {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    ctx.strokeStyle = color;
+    if (color === 'eraser') {
+       ctx.globalCompositeOperation = 'destination-out';
+       ctx.lineWidth = 40; // Grande
+       ctx.strokeStyle = 'rgba(0,0,0,1)';
+    } else {
+       ctx.globalCompositeOperation = 'source-over';
+       ctx.lineWidth = lineWidth;
+       ctx.strokeStyle = color;
+    }
+    
     ctx.lineTo(x, y);
     ctx.stroke();
   };
@@ -91,14 +101,22 @@ export const TacticsPage = () => {
               { hex: '#FFFFFF', name: 'Blanco' },
               { hex: '#FF0000', name: 'Rojo' },
               { hex: '#000000', name: 'Negro' },
+              { hex: '#EAB308', name: 'Amarillo' },
             ].map(c => (
               <button 
                 key={c.hex}
                 onClick={() => setColor(c.hex)}
-                className={`w-10 h-10 rounded-full border-2 transition-transform ${color === c.hex ? 'scale-110 border-primary' : 'border-white/20'}`}
+                className={`w-10 h-10 rounded-full border-2 transition-transform shadow-md ${color === c.hex ? 'scale-110 border-white' : 'border-black/20'}`}
                 style={{ backgroundColor: c.hex }}
               />
             ))}
+            <button
+               onClick={() => setColor('eraser')}
+               className={`w-10 h-10 rounded-xl border-2 transition-transform flex items-center justify-center bg-slate-200 text-slate-800 shadow-md ${color === 'eraser' ? 'scale-110 border-primary' : 'border-transparent'}`}
+               title="Goma de Borrar Grande"
+            >
+               <Eraser size={20} />
+            </button>
          </div>
          
          <button 
@@ -113,21 +131,25 @@ export const TacticsPage = () => {
       <div className="flex-1 mx-0 sm:mx-0 mb-0 mt-2 relative rounded-t-3xl overflow-hidden border-t-8 border-surface shadow-2xl bg-gradient-to-b from-[#2E5E32] to-[#1B3B22]">
          
          {/* CSS Court Lines Background */}
-         <div className="absolute inset-0 pointer-events-none opacity-40">
+         <div className="absolute inset-0 pointer-events-none opacity-20">
             {/* Center Line */}
-            <div className="absolute top-1/2 left-0 w-full h-1 bg-white -translate-y-1/2" />
+            <div className="absolute top-1/2 left-0 w-full h-[2px] bg-white -translate-y-1/2" />
             
             {/* Center Circle */}
-            <div className="absolute top-1/2 left-1/2 w-32 h-32 border-4 border-white rounded-full -translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute top-1/2 left-1/2 w-3 h-3 bg-white rounded-full -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute top-1/2 left-1/2 w-32 h-32 border-[3px] border-white rounded-full -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-white rounded-full -translate-x-1/2 -translate-y-1/2" />
 
-            {/* Top Goal Area */}
-            <div className="absolute top-0 left-1/2 border-4 border-t-0 border-white w-48 h-32 -translate-x-1/2" />
-            <div className="absolute top-0 left-1/2 border-4 border-t-0 border-white w-24 h-12 -translate-x-1/2 bg-white/20" />
+            {/* 25-Yard Lines (Hockey 23m) */}
+            <div className="absolute top-[25%] left-0 w-full h-[2px] bg-white/70" />
+            <div className="absolute bottom-[25%] left-0 w-full h-[2px] bg-white/70" />
 
-            {/* Bottom Goal Area */}
-            <div className="absolute bottom-0 left-1/2 border-4 border-b-0 border-white w-48 h-32 -translate-x-1/2" />
-            <div className="absolute bottom-0 left-1/2 border-4 border-b-0 border-white w-24 h-12 -translate-x-1/2 bg-white/20" />
+            {/* Top Goal Area (Striking Circle) */}
+            <div className="absolute top-0 left-1/2 border-[3px] border-t-0 border-white w-64 h-32 -translate-x-1/2 rounded-b-full" />
+            <div className="absolute top-0 left-1/2 border-[3px] border-t-0 border-white w-20 h-8 -translate-x-1/2 bg-white/10" />
+
+            {/* Bottom Goal Area (Striking Circle) */}
+            <div className="absolute bottom-0 left-1/2 border-[3px] border-b-0 border-white w-64 h-32 -translate-x-1/2 rounded-t-full" />
+            <div className="absolute bottom-0 left-1/2 border-[3px] border-b-0 border-white w-20 h-8 -translate-x-1/2 bg-white/10" />
          </div>
 
          {/* Canvas Layer */}
