@@ -7,21 +7,28 @@ export const TrainingPage = () => {
   const players = useMemo(() => allPlayers.filter(p => p.isActive), [allPlayers]);
   const saveTraining = useAppStore(state => state.saveTraining);
 
-  const [teamA, setTeamA] = useState<Player[]>([]);
-  const [teamB, setTeamB] = useState<Player[]>([]);
-  const [scoreA, setScoreA] = useState(0);
-  const [scoreB, setScoreB] = useState(0);
+  const activeTraining = useAppStore(state => state.activeTraining);
+  const setActiveTraining = useAppStore(state => state.setActiveTraining);
+  const clearActiveTraining = useAppStore(state => state.clearActiveTraining);
+
+  const teamA = useMemo(() => players.filter(p => activeTraining.teamA.includes(p.id)), [players, activeTraining.teamA]);
+  const teamB = useMemo(() => players.filter(p => activeTraining.teamB.includes(p.id)), [players, activeTraining.teamB]);
+  
+  const scoreA = activeTraining.scoreA;
+  const scoreB = activeTraining.scoreB;
+  const setScoreA = (score: number) => setActiveTraining({ scoreA: score });
+  const setScoreB = (score: number) => setActiveTraining({ scoreB: score });
 
   const availablePlayers = useMemo(() => {
-    return players.filter(p => !teamA.includes(p) && !teamB.includes(p));
-  }, [players, teamA, teamB]);
+    return players.filter(p => !activeTraining.teamA.includes(p.id) && !activeTraining.teamB.includes(p.id));
+  }, [players, activeTraining]);
 
-  const addToTeamA = (p: Player) => setTeamA([...teamA, p]);
-  const addToTeamB = (p: Player) => setTeamB([...teamB, p]);
+  const addToTeamA = (p: Player) => setActiveTraining({ teamA: [...activeTraining.teamA, p.id] });
+  const addToTeamB = (p: Player) => setActiveTraining({ teamB: [...activeTraining.teamB, p.id] });
   
   const removeFromTeam = (p: Player, team: 'A'|'B') => {
-    if (team === 'A') setTeamA(teamA.filter(x => x.id !== p.id));
-    if (team === 'B') setTeamB(teamB.filter(x => x.id !== p.id));
+    if (team === 'A') setActiveTraining({ teamA: activeTraining.teamA.filter(id => id !== p.id) });
+    if (team === 'B') setActiveTraining({ teamB: activeTraining.teamB.filter(id => id !== p.id) });
   };
 
   const handleFinish = () => {
@@ -30,14 +37,11 @@ export const TrainingPage = () => {
       date: Date.now(),
       teamAScore: scoreA,
       teamBScore: scoreB,
-      teamA_PlayerIds: teamA.map(p => p.id),
-      teamB_PlayerIds: teamB.map(p => p.id)
+      teamA_PlayerIds: activeTraining.teamA,
+      teamB_PlayerIds: activeTraining.teamB
     });
     // Reset
-    setTeamA([]);
-    setTeamB([]);
-    setScoreA(0);
-    setScoreB(0);
+    clearActiveTraining();
     alert('¡Entrenamiento Registrado en la Base de Datos!');
   };
 

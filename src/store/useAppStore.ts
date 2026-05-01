@@ -94,6 +94,19 @@ interface AppState {
   saveMatch: (match: Omit<Match, 'id'>) => void;
   saveTraining: (t: Omit<TrainingMatch, 'id'>) => void;
   logAttendance: (dateStr: string, playerIds: string[]) => void;
+
+  // Persistencia de vistas (Pizarra y Entrenamiento)
+  tacticsImage: string | null;
+  setTacticsImage: (image: string | null) => void;
+  
+  activeTraining: {
+    teamA: string[];
+    teamB: string[];
+    scoreA: number;
+    scoreB: number;
+  };
+  setActiveTraining: (training: Partial<AppState['activeTraining']>) => void;
+  clearActiveTraining: () => void;
 }
 
 // ------------------------------
@@ -164,7 +177,14 @@ export const useAppStore = create<AppState>()(
         return {
           attendances: [...others, { id: crypto.randomUUID(), dateStr, presentPlayerIds: playerIds }]
         };
-      })
+      }),
+
+      tacticsImage: null,
+      setTacticsImage: (img) => set({ tacticsImage: img }),
+
+      activeTraining: { teamA: [], teamB: [], scoreA: 0, scoreB: 0 },
+      setActiveTraining: (t) => set(state => ({ activeTraining: { ...state.activeTraining, ...t } })),
+      clearActiveTraining: () => set({ activeTraining: { teamA: [], teamB: [], scoreA: 0, scoreB: 0 } })
     }),
     {
       name: 'valkyrie-v2-relational-db', 

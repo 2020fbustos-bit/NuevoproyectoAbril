@@ -6,6 +6,7 @@ export const MatchesPage = () => {
   const players = useAppStore(state => state.players);
   const saveMatch = useAppStore(state => state.saveMatch);
   const matchesLog = useAppStore(state => state.matches);
+  const teamName = useAppStore(state => state.teamName);
 
   const [isMatchActive, setIsMatchActive] = useState(false);
   const [rivalName, setRivalName] = useState('');
@@ -132,7 +133,7 @@ export const MatchesPage = () => {
          </div>
          <div className="flex justify-between items-center px-4">
             <div className="text-center flex-1">
-               <h3 className="text-primary text-xs font-black uppercase tracking-widest mb-1">Valkyrie</h3>
+               <h3 className="text-primary text-xs font-black uppercase tracking-widest mb-1 truncate">{teamName}</h3>
                <span className="text-6xl font-black text-white drop-shadow-lg">{ourScore}</span>
             </div>
             <div className="px-4 text-white/30 text-4xl font-black">-</div>

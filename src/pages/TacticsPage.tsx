@@ -1,8 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Eraser, Trash2, PenTool } from 'lucide-react';
 
+import { useAppStore } from '../store/useAppStore';
+
 export const TacticsPage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const tacticsImage = useAppStore(state => state.tacticsImage);
+  const setTacticsImage = useAppStore(state => state.setTacticsImage);
+
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState('#FFFFFF'); // Default White or 'eraser'
   const [lineWidth, setLineWidth] = useState(2);
@@ -23,9 +28,17 @@ export const TacticsPage = () => {
     if (ctx) {
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      ctx.lineWidth = 1.5; // Thin brush requested
+      
+      // Load saved image if exists
+      if (tacticsImage) {
+        const img = new Image();
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        };
+        img.src = tacticsImage;
+      }
     }
-  }, []);
+  }, [tacticsImage]);
 
   const drawCourt = () => {
      // A pure CSS court is already underneath, we just draw lines on the transparent canvas
@@ -76,6 +89,8 @@ export const TacticsPage = () => {
     const canvas = canvasRef.current;
     if (canvas) {
       canvas.getContext('2d')?.closePath();
+      // Save state to store
+      setTacticsImage(canvas.toDataURL());
     }
   };
 
@@ -84,6 +99,7 @@ export const TacticsPage = () => {
     if (canvas) {
       const ctx = canvas.getContext('2d');
       ctx?.clearRect(0, 0, canvas.width, canvas.height);
+      setTacticsImage(null);
     }
   };
 
@@ -144,12 +160,12 @@ export const TacticsPage = () => {
             <div className="absolute bottom-[25%] left-0 w-full h-[2px] bg-white/70" />
 
             {/* Top Goal Area (Striking Circle) */}
-            <div className="absolute top-0 left-1/2 border-[3px] border-t-0 border-white w-64 h-32 -translate-x-1/2 rounded-b-full" />
-            <div className="absolute top-0 left-1/2 border-[3px] border-t-0 border-white w-20 h-8 -translate-x-1/2 bg-white/10" />
+            <div className="absolute top-0 left-1/2 border-[3px] border-t-0 border-white w-[50%] h-[15%] -translate-x-1/2 rounded-b-full" />
+            <div className="absolute top-0 left-1/2 border-[3px] border-t-0 border-white w-[20%] h-[5%] -translate-x-1/2 bg-white/10" />
 
             {/* Bottom Goal Area (Striking Circle) */}
-            <div className="absolute bottom-0 left-1/2 border-[3px] border-b-0 border-white w-64 h-32 -translate-x-1/2 rounded-t-full" />
-            <div className="absolute bottom-0 left-1/2 border-[3px] border-b-0 border-white w-20 h-8 -translate-x-1/2 bg-white/10" />
+            <div className="absolute bottom-0 left-1/2 border-[3px] border-b-0 border-white w-[50%] h-[15%] -translate-x-1/2 rounded-t-full" />
+            <div className="absolute bottom-0 left-1/2 border-[3px] border-b-0 border-white w-[20%] h-[5%] -translate-x-1/2 bg-white/10" />
          </div>
 
          {/* Canvas Layer */}
