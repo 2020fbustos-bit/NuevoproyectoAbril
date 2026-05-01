@@ -90,7 +90,7 @@ interface AppState {
   addPlayer: (player: Omit<Player, 'id'>) => string;
   updatePlayer: (id: string, player: Partial<Player>) => void;
   deletePlayer: (id: string) => void;
-  updateUserAuth: (playerId: string, role: Role, pass: string) => void;
+  updateUserAuth: (playerId: string, role: Role, pass: string, email?: string) => void;
   saveMatch: (match: Omit<Match, 'id'>) => void;
   saveTraining: (t: Omit<TrainingMatch, 'id'>) => void;
   logAttendance: (dateStr: string, playerIds: string[]) => void;
@@ -142,13 +142,13 @@ export const useAppStore = create<AppState>()(
         players: state.players.filter(p => p.id !== id),
         users: state.users.filter(u => u.id !== id)
       })),
-      updateUserAuth: (playerId, role, pass) => set((state) => {
+      updateUserAuth: (playerId, role, pass, email) => set((state) => {
          const existingUser = state.users.find(u => u.id === playerId);
          const player = state.players.find(p => p.id === playerId);
          if (existingUser) {
-            return { users: state.users.map(u => u.id === playerId ? { ...u, role, pass } : u) };
+            return { users: state.users.map(u => u.id === playerId ? { ...u, role, pass, email: email || u.email } : u) };
          } else if (player) {
-            const rutSanitized = player.rut.replace(/[\.\-]/g, '');
+            const rutSanitized = email || player.rut.replace(/[\.\-]/g, '');
             return { users: [...state.users, { id: playerId, role, email: rutSanitized, pass }] };
          }
          return state;

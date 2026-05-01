@@ -55,11 +55,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="flex flex-col h-screen w-full overflow-hidden bg-background relative">
-        {/* Top Header Logout */}
-        <div className="absolute top-4 right-4 z-50 text-white/50 flex gap-4">
-           {isAdmin && <Link to="/setup"><Settings size={20} className="hover:text-primary transition-colors"/></Link>}
-           <button onClick={logout}><LogOut size={20} className="hover:text-red-500 transition-colors"/></button>
-        </div>
+
 
         <main className="flex-1 overflow-y-auto w-full pb-24 max-w-4xl mx-auto">
           <Routes>
@@ -75,12 +71,18 @@ function App() {
         
         <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 pb-safe px-2 sm:px-6 py-2 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] rounded-t-3xl">
            <div className="flex justify-between items-center max-w-4xl mx-auto">
-             <NavLink to="/" icon={ClipboardCheck} label="Asistencia" />
-             {isAdmin && <NavLink to="/indicators" icon={BarChart2} label="Métricas" />}
+             <NavLink to="/" icon={ClipboardCheck} label="Lista" />
+             {isAdmin && <NavLink to="/indicators" icon={BarChart2} label="Datos" />}
              {isAdmin && <NavLink to="/players" icon={Users} label="Fichas" />}
              {isAdmin && <NavLink to="/tactics" icon={LayoutDashboard} label="Pizarra" />}
              {isAdmin && <NavLink to="/training" icon={Swords} label="Entrenar" />}
              <NavLink to="/matches" icon={CalendarDays} label="Partidos" />
+             {isAdmin && <NavLink to="/setup" icon={Settings} label="Ajustes" />}
+             
+             <button onClick={logout} className="flex flex-col items-center justify-center p-2 rounded-xl transition-all text-slate-400 hover:text-red-500">
+                <LogOut size={24} />
+                <span className="text-[10px] uppercase font-bold tracking-wider mt-1">Salir</span>
+             </button>
            </div>
         </nav>
       </div>

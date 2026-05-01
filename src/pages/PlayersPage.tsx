@@ -91,13 +91,24 @@ const PlayerEditor = ({ player, onClose }: { player: any, onClose: () => void })
   
   const [formData, setFormData] = useState(player);
   
-  const userAuth = users.find(u => u.id === player.id) || { role: 'jugadora', pass: '1234' };
+  const userAuth = users.find(u => u.id === player.id) || { role: 'jugadora', pass: '1234', email: player.rut.replace(/[\.\-]/g, '') };
   const [role, setRole] = useState(userAuth.role);
   const [pass, setPass] = useState(userAuth.pass);
+  const [username, setUsername] = useState(userAuth.email);
+  const DAYS = ['L', 'M', 'Mi', 'J', 'V', 'S', 'D'];
+
+  const handleDaySelect = (day: string) => {
+    setFormData((prev: any) => ({
+      ...prev,
+      trainingDays: prev.trainingDays.includes(day)
+        ? prev.trainingDays.filter((d: string) => d !== day)
+        : [...prev.trainingDays, day]
+    }));
+  };
 
   const handleSave = () => {
     updatePlayer(player.id, formData);
-    updateUserAuth(player.id, role, pass);
+    updateUserAuth(player.id, role, pass, username);
     onClose();
   };
 
@@ -106,32 +117,54 @@ const PlayerEditor = ({ player, onClose }: { player: any, onClose: () => void })
       <div className="grid grid-cols-2 gap-3">
          <div>
             <label className="text-[10px] font-bold text-white/50 uppercase">Posición</label>
-            <input type="text" value={formData.position} onChange={e => setFormData({...formData, position: e.target.value})} className="w-full bg-background border border-white/10 rounded-lg px-2 py-1.5 text-white focus:border-primary outline-none" />
+            <input type="text" value={formData.position} onChange={e => setFormData({...formData, position: e.target.value})} className="w-full bg-white text-black font-bold border-0 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary outline-none" />
          </div>
          <div>
             <label className="text-[10px] font-bold text-white/50 uppercase">Celular</label>
-            <input type="text" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full bg-background border border-white/10 rounded-lg px-2 py-1.5 text-white focus:border-primary outline-none" />
+            <input type="text" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full bg-white text-black font-bold border-0 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary outline-none" />
          </div>
       </div>
       
+      {/* Edit Training Days */}
+      <div>
+         <label className="text-[10px] font-bold text-white/50 uppercase mb-2 block">Días de Entrenamiento</label>
+         <div className="flex justify-between items-center bg-surface p-2 rounded-xl border border-white/10">
+            {DAYS.map(day => {
+              const isSelected = formData.trainingDays.includes(day);
+              return (
+                <button
+                  key={day}
+                  type="button"
+                  onClick={() => handleDaySelect(day)}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition-all duration-200
+                    ${isSelected ? 'bg-primary text-black scale-110 shadow-md' : 'bg-background text-white/40 hover:bg-white/10'}
+                  `}
+                >
+                  {day}
+                </button>
+              )
+            })}
+         </div>
+      </div>
+
       <div className="bg-orange-500/10 p-3 rounded-lg border border-orange-500/20 space-y-2">
          <p className="text-orange-500/70 text-[10px] uppercase font-black flex items-center gap-1"><ShieldAlert size={12}/> Info Médica y Emergencia</p>
          <div>
             <label className="text-[10px] font-bold text-orange-200/50 uppercase">Clínica de Preferencia</label>
-            <input type="text" value={formData.preferredClinic || ''} onChange={e => setFormData({...formData, preferredClinic: e.target.value})} className="w-full bg-background border border-orange-500/30 rounded-lg px-2 py-1.5 text-white focus:border-orange-500 outline-none" placeholder="Indisa, Alemana, etc." />
+            <input type="text" value={formData.preferredClinic || ''} onChange={e => setFormData({...formData, preferredClinic: e.target.value})} className="w-full bg-white text-black font-bold border-0 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-orange-500 outline-none" placeholder="Indisa, Alemana, etc." />
          </div>
          <div>
             <label className="text-[10px] font-bold text-orange-200/50 uppercase">Alergias</label>
-            <input type="text" value={formData.allergies} onChange={e => setFormData({...formData, allergies: e.target.value})} className="w-full bg-background border border-orange-500/30 rounded-lg px-2 py-1.5 text-white focus:border-orange-500 outline-none" />
+            <input type="text" value={formData.allergies} onChange={e => setFormData({...formData, allergies: e.target.value})} className="w-full bg-white text-black font-bold border-0 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-orange-500 outline-none" />
          </div>
          <div className="grid grid-cols-2 gap-2">
            <div>
               <label className="text-[10px] font-bold text-orange-200/50 uppercase">Contacto</label>
-              <input type="text" value={formData.emergencyContactName} onChange={e => setFormData({...formData, emergencyContactName: e.target.value})} className="w-full bg-background border border-orange-500/30 rounded-lg px-2 py-1.5 text-white focus:border-orange-500 outline-none" />
+              <input type="text" value={formData.emergencyContactName} onChange={e => setFormData({...formData, emergencyContactName: e.target.value})} className="w-full bg-white text-black font-bold border-0 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-orange-500 outline-none" />
            </div>
            <div>
               <label className="text-[10px] font-bold text-orange-200/50 uppercase">Teléfono Contacto</label>
-              <input type="text" value={formData.emergencyContactPhone} onChange={e => setFormData({...formData, emergencyContactPhone: e.target.value})} className="w-full bg-background border border-orange-500/30 rounded-lg px-2 py-1.5 text-white focus:border-orange-500 outline-none" />
+              <input type="text" value={formData.emergencyContactPhone} onChange={e => setFormData({...formData, emergencyContactPhone: e.target.value})} className="w-full bg-white text-black font-bold border-0 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-orange-500 outline-none" />
            </div>
          </div>
       </div>
@@ -141,29 +174,32 @@ const PlayerEditor = ({ player, onClose }: { player: any, onClose: () => void })
          <div className="grid grid-cols-2 gap-2">
            <div>
               <label className="text-[10px] font-bold text-blue-200/50 uppercase">Fecha Activación</label>
-              <input type="date" value={formData.activationDate || ''} onChange={e => setFormData({...formData, activationDate: e.target.value})} className="w-full bg-background border border-blue-500/30 rounded-lg px-2 py-1.5 text-white focus:border-blue-500 outline-none" />
+              <input type="date" value={formData.activationDate || ''} onChange={e => setFormData({...formData, activationDate: e.target.value})} className="w-full bg-white text-black font-bold border-0 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none" />
            </div>
            <div>
               <label className="text-[10px] font-bold text-blue-200/50 uppercase">Fecha Desactivación</label>
-              <input type="date" value={formData.deactivationDate || ''} onChange={e => setFormData({...formData, deactivationDate: e.target.value})} className="w-full bg-background border border-blue-500/30 rounded-lg px-2 py-1.5 text-white focus:border-blue-500 outline-none" />
+              <input type="date" value={formData.deactivationDate || ''} onChange={e => setFormData({...formData, deactivationDate: e.target.value})} className="w-full bg-white text-black font-bold border-0 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none" />
            </div>
          </div>
       </div>
 
       <div className="bg-purple-500/10 p-3 rounded-lg border border-purple-500/20 space-y-2">
          <p className="text-purple-500/70 text-[10px] uppercase font-black flex items-center gap-1"><Key size={12}/> Acceso a la App</p>
-         <p className="text-white/50 text-[10px] mb-2">Usuario: <span className="font-bold text-white">{player.rut.replace(/[\.\-]/g, '')}</span></p>
+         <div>
+            <label className="text-[10px] font-bold text-purple-200/50 uppercase">Usuario</label>
+            <input type="text" value={username} onChange={e => setUsername(e.target.value)} className="w-full bg-white text-black font-bold border-0 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-purple-500 outline-none mb-2" />
+         </div>
          <div className="grid grid-cols-2 gap-2">
            <div>
               <label className="text-[10px] font-bold text-purple-200/50 uppercase">Perfil</label>
-              <select value={role} onChange={e => setRole(e.target.value as any)} className="w-full bg-background border border-purple-500/30 rounded-lg px-2 py-1.5 text-white focus:border-purple-500 outline-none">
+              <select value={role} onChange={e => setRole(e.target.value as any)} className="w-full bg-white text-black font-bold border-0 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-purple-500 outline-none">
                  <option value="jugadora">Jugadora</option>
                  <option value="admin">Administradora</option>
               </select>
            </div>
            <div>
               <label className="text-[10px] font-bold text-purple-200/50 uppercase">Clave (4 dígitos)</label>
-              <input type="text" maxLength={4} value={pass} onChange={e => setPass(e.target.value)} className="w-full bg-background border border-purple-500/30 rounded-lg px-2 py-1.5 text-white focus:border-purple-500 outline-none" placeholder="1234" />
+              <input type="text" maxLength={4} value={pass} onChange={e => setPass(e.target.value)} className="w-full bg-white text-black font-bold border-0 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="1234" />
            </div>
          </div>
       </div>
