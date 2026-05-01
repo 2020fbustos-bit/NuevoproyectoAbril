@@ -1,22 +1,33 @@
 import React, { useState, useMemo } from 'react';
 import { useAppStore } from '../store/useAppStore';
-import { CheckCircle2, UserX, BarChart3, AlertTriangle, ChevronRight, TrendingUp } from 'lucide-react';
+import { CheckCircle2, UserX, BarChart3, AlertTriangle, ChevronRight, TrendingUp, Calendar } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const DAYS_MAP = ['D', 'L', 'M', 'Mi', 'J', 'V', 'S'];
 
 export const HomePage = () => {
   const players = useAppStore(state => state.players);
+  const attendances = useAppStore(state => state.attendances);
+  const logAttendance = useAppStore(state => state.logAttendance);
   
-  const todayIndex = new Date().getDay();
-  const todayInitial = DAYS_MAP[todayIndex];
+  // Date selection
+  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
   
-  const expectedPlayers = players.filter(p => p.isActive && p.trainingDays.includes(todayInitial));
+  const parsedDate = new Date(selectedDate + 'T12:00:00');
+  const dayIndex = parsedDate.getDay();
+  const dayInitial = DAYS_MAP[dayIndex];
   
-  const [checkedInIds, setCheckedInIds] = useState<string[]>([]);
+  // Filter active players that have training on the selected day
+  const expectedPlayers = players.filter(p => p.isActive && p.trainingDays.includes(dayInitial));
+  
+  const currentAttendance = attendances.find(a => a.dateStr === selectedDate);
+  const checkedInIds = currentAttendance?.presentPlayerIds || [];
   
   const toggleCheckIn = (id: string) => {
-    setCheckedInIds(prev => prev.includes(id) ? prev.filter(pid => pid !== id) : [...prev, id]);
+    const newIds = checkedInIds.includes(id) 
+      ? checkedInIds.filter(pid => pid !== id) 
+      : [...checkedInIds, id];
+    logAttendance(selectedDate, newIds);
   };
 
   const attendancePercentage = expectedPlayers.length > 0 
@@ -26,76 +37,34 @@ export const HomePage = () => {
   return (
     <div className="min-h-screen pb-24 font-sans">
       
-      {/* Hero Header matching the screenshot */}
+      {/* Header */}
       <div className="pt-8 px-4 pb-6">
         <h1 className="text-[32px] leading-tight font-black text-primary uppercase tracking-tight">
-          Donde la pasión <br />
-          se encuentra con el juego
+          Control de<br />Asistencia
         </h1>
-        <p className="text-white font-medium text-sm mt-2 tracking-widest uppercase">
-          Liga Femenina Valkyrie 2026
+        <p className="text-white font-medium text-sm mt-2 tracking-widest uppercase flex items-center gap-2">
+          <Calendar size={16} /> Selecciona la fecha
         </p>
+        
+        {/* Date Picker */}
+        <div className="mt-4">
+          <input 
+            type="date" 
+            value={selectedDate}
+            onChange={e => setSelectedDate(e.target.value)}
+            className="w-full bg-surface border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary font-bold transition-colors appearance-none"
+          />
+        </div>
       </div>
 
       <div className="px-4 space-y-6">
         
-        {/* KPI Card */}
-        <div className="bg-surface rounded-2xl p-5 shadow-lg relative overflow-hidden border border-white/10">
-          <div className="flex justify-between items-center relative z-10">
-             <div>
-               <p className="text-white text-xs font-bold uppercase tracking-widest">Asistencia de Hoy</p>
-               <h2 className="text-5xl font-black text-white mt-1 drop-shadow-md">
-                  {attendancePercentage}<span className="text-xl opacity-80">%</span>
-               </h2>
-             </div>
-             <BarChart3 size={48} className="text-primary opacity-50" />
-          </div>
-          <div className="w-full bg-background/50 h-3 mt-4 rounded-full overflow-hidden relative z-10">
-            <div 
-                className="h-full bg-primary transition-all duration-700 ease-out" 
-                style={{ width: `${attendancePercentage}%` }}
-            />
-          </div>
-          {/* Decorative background shape */}
-          <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-white/5 blur-2xl pointer-events-none" />
-        </div>
 
-        {/* Global Statistics Graph (Valkyrie 2.0) */}
-        <div className="bg-surface rounded-2xl p-5 shadow-lg border border-white/10">
-           <h3 className="text-white text-sm font-bold uppercase tracking-widest flex items-center gap-2 mb-6">
-              <TrendingUp className="text-primary" size={16} /> Evolución Semanal
-           </h3>
-           <div className="h-48 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                 <BarChart data={[
-                   { name: 'L', count: Math.floor(Math.random() * 20) + 10 },
-                   { name: 'M', count: Math.floor(Math.random() * 20) + 10 },
-                   { name: 'Mi', count: Math.floor(Math.random() * 20) + 10 },
-                   { name: 'J', count: Math.floor(Math.random() * 20) + 10 },
-                   { name: 'V', count: Math.floor(Math.random() * 20) + 10 }
-                 ]}>
-                    <Tooltip 
-                      cursor={{fill: 'rgba(255,255,255,0.05)'}}
-                      contentStyle={{ backgroundColor: '#1B3B22', border: '1px solid #3F7E44', borderRadius: '12px', color: '#fff' }}
-                    />
-                    <XAxis dataKey="name" stroke="#fff" opacity={0.5} tickLine={false} axisLine={false} />
-                    <Bar dataKey="count" radius={[6, 6, 0, 0]}>
-                      {
-                        /* We color today different as a demo */
-                        [0,1,2,3,4].map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={index === 2 ? '#FDE047' : '#3F7E44'} />
-                        ))
-                      }
-                    </Bar>
-                 </BarChart>
-              </ResponsiveContainer>
-           </div>
-        </div>
 
         {/* Attendance List */}
         <div>
            <div className="flex justify-between items-end mb-3 px-1">
-              <h2 className="text-white font-bold uppercase tracking-widest text-sm">Lista del Día ({todayInitial})</h2>
+              <h2 className="text-white font-bold uppercase tracking-widest text-sm">Lista de Jugadoras ({dayInitial})</h2>
               <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-md">{checkedInIds.length} / {expectedPlayers.length}</span>
            </div>
 
@@ -104,43 +73,51 @@ export const HomePage = () => {
                 <div className="bg-background w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3">
                    <AlertTriangle className="text-primary" />
                 </div>
-                <h3 className="text-white font-bold mb-1">¡Día libre o sin datos!</h3>
-                <p className="text-white/60 text-sm">No hay jugadoras agendadas para entrenar hoy según sus fichas.</p>
+                <h3 className="text-white font-bold mb-1">Día sin entrenamientos</h3>
+                <p className="text-white/60 text-sm">No hay jugadoras agendadas para entrenar en este día según sus fichas.</p>
              </div>
            ) : (
              <div className="space-y-3">
                {expectedPlayers.map(player => {
                   const isPresent = checkedInIds.includes(player.id);
                   return (
-                    <button 
+                    <div 
                       key={player.id}
-                      onClick={() => toggleCheckIn(player.id)}
-                      className="flex items-center p-3 rounded-xl w-full text-left transition-all active:scale-95 duration-200 bg-surface shadow-md hover:bg-surface/90 border border-transparent group"
+                      className={`flex items-center p-3 rounded-xl w-full text-left transition-all duration-200 border shadow-md ${
+                        isPresent ? 'bg-surface/80 border-primary/30' : 'bg-surface border-transparent'
+                      }`}
                     >
                       <div className="flex-1 min-w-0 flex items-center gap-3">
                          <div className={`w-12 h-12 rounded-full flex items-center justify-center font-black text-lg transition-colors ${
-                           isPresent ? 'bg-primary text-background' : 'bg-background/80 border border-white/20 text-white'
+                           isPresent ? 'bg-primary text-background shadow-[0_0_15px_rgba(253,224,71,0.3)]' : 'bg-background/80 border border-white/20 text-white/50'
                          }`}>
                             {player.jerseyNumber || '-'}
                          </div>
                          <div>
-                           <span className="block font-bold text-white text-base truncate">
+                           <span className={`block font-bold text-base truncate transition-colors ${isPresent ? 'text-white' : 'text-white/70'}`}>
                               {player.nickname}
                            </span>
-                           <span className="text-xs text-white/70 truncate">{player.fullName}</span>
+                           <span className="text-xs text-white/40 truncate">{player.fullName}</span>
                          </div>
                       </div>
                       
                       <div className="pl-3">
-                        {isPresent ? (
-                          <CheckCircle2 className="text-primary drop-shadow-[0_0_10px_rgba(253,224,71,0.5)]" size={28} />
-                        ) : (
-                          <div className="px-3 py-1 bg-primary text-background text-[10px] font-black uppercase rounded-md shadow-sm">
-                            Marcar
-                          </div>
-                        )}
+                        <div className="flex bg-background/80 rounded-lg p-1 border border-white/5">
+                           <button 
+                              onClick={() => isPresent && toggleCheckIn(player.id)}
+                              className={`px-3 py-1.5 text-[10px] font-black uppercase rounded-md transition-all ${!isPresent ? 'bg-red-500/20 text-red-400 border border-red-500/30 shadow-sm' : 'text-white/40 hover:text-white border border-transparent'}`}
+                           >
+                              Falta
+                           </button>
+                           <button 
+                              onClick={() => !isPresent && toggleCheckIn(player.id)}
+                              className={`px-3 py-1.5 text-[10px] font-black uppercase rounded-md transition-all ${isPresent ? 'bg-primary text-background shadow-[0_0_10px_rgba(253,224,71,0.3)] border border-primary' : 'text-white/40 hover:text-white border border-transparent'}`}
+                           >
+                              Vino
+                           </button>
+                        </div>
                       </div>
-                    </button>
+                    </div>
                   )
                })}
              </div>
@@ -150,3 +127,4 @@ export const HomePage = () => {
     </div>
   );
 };
+
