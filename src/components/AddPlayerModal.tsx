@@ -18,7 +18,9 @@ export const AddPlayerModal = ({ onClose }: { onClose: () => void }) => {
     emergencyContactName: '',
     emergencyContactPhone: '',
     allergies: '',
+    regularMedications: '',
     preferredClinic: '',
+    comments: '',
     trainingDays: [],
     activationDate: new Date().toISOString().split('T')[0],
     deactivationDate: '',
@@ -102,24 +104,32 @@ export const AddPlayerModal = ({ onClose }: { onClose: () => void }) => {
                 Datos Médicos y Emergencia
              </h3>
              <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl space-y-3">
-                 <div>
-                    <label className="text-xs font-semibold text-orange-200/70 uppercase">¿Alergias?</label>
-                    <input type="text" value={formData.allergies} onChange={e => setFormData({...formData, allergies: e.target.value})} className="w-full mt-1 bg-slate-900 border border-orange-500/30 rounded-xl p-3 text-white focus:border-orange-500 outline-none" placeholder="Ej. Penicilina (Dejar en blanco si ninguna)" />
-                 </div>
-                 <div className="grid grid-cols-2 gap-3">
-                   <div>
-                      <label className="text-xs font-semibold text-orange-200/70 uppercase">Contacto</label>
-                      <input type="text" value={formData.emergencyContactName} onChange={e => setFormData({...formData, emergencyContactName: e.target.value})} className="w-full mt-1 bg-slate-900 border border-orange-500/30 rounded-xl p-3 text-white focus:border-orange-500 outline-none" placeholder="Nombre" />
-                   </div>
-                   <div>
-                      <label className="text-xs font-semibold text-orange-200/70 uppercase">Teléfono</label>
-                      <input type="tel" value={formData.emergencyContactPhone} onChange={e => setFormData({...formData, emergencyContactPhone: e.target.value})} className="w-full mt-1 bg-slate-900 border border-orange-500/30 rounded-xl p-3 text-white focus:border-orange-500 outline-none" placeholder="Celular" />
-                   </div>
-                 </div>
-                 <div>
-                    <label className="text-xs font-semibold text-orange-200/70 uppercase">Clínica de Preferencia</label>
-                    <input type="text" value={formData.preferredClinic} onChange={e => setFormData({...formData, preferredClinic: e.target.value})} className="w-full mt-1 bg-slate-900 border border-orange-500/30 rounded-xl p-3 text-white focus:border-orange-500 outline-none" placeholder="Clínica Alemana, Indisa, etc." />
-                 </div>
+                  <div>
+                     <label className="text-xs font-semibold text-orange-200/70 uppercase">¿Alergias?</label>
+                     <input type="text" value={formData.allergies} onChange={e => setFormData({...formData, allergies: e.target.value})} className="w-full mt-1 bg-slate-900 border border-orange-500/30 rounded-xl p-3 text-white focus:border-orange-500 outline-none" placeholder="Ej. Penicilina (Dejar en blanco si ninguna)" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                       <label className="text-xs font-semibold text-orange-200/70 uppercase">Contacto</label>
+                       <input type="text" value={formData.emergencyContactName} onChange={e => setFormData({...formData, emergencyContactName: e.target.value})} className="w-full mt-1 bg-slate-900 border border-orange-500/30 rounded-xl p-3 text-white focus:border-orange-500 outline-none" placeholder="Nombre" />
+                    </div>
+                    <div>
+                       <label className="text-xs font-semibold text-orange-200/70 uppercase">Teléfono</label>
+                       <input type="tel" value={formData.emergencyContactPhone} onChange={e => setFormData({...formData, emergencyContactPhone: e.target.value})} className="w-full mt-1 bg-slate-900 border border-orange-500/30 rounded-xl p-3 text-white focus:border-orange-500 outline-none" placeholder="Celular" />
+                    </div>
+                  </div>
+                  <div>
+                     <label className="text-xs font-semibold text-orange-200/70 uppercase">Clínica de Preferencia</label>
+                     <input type="text" value={formData.preferredClinic} onChange={e => setFormData({...formData, preferredClinic: e.target.value})} className="w-full mt-1 bg-slate-900 border border-orange-500/30 rounded-xl p-3 text-white focus:border-orange-500 outline-none" placeholder="Clínica Alemana, Indisa, etc." />
+                  </div>
+                  <div>
+                     <label className="text-xs font-semibold text-orange-200/70 uppercase">Remedios de Base</label>
+                     <input type="text" value={formData.regularMedications} onChange={e => setFormData({...formData, regularMedications: e.target.value})} className="w-full mt-1 bg-slate-900 border border-orange-500/30 rounded-xl p-3 text-white focus:border-orange-500 outline-none" placeholder="Ej. Antialérgicos, etc." />
+                  </div>
+                  <div>
+                     <label className="text-xs font-semibold text-orange-200/70 uppercase">Comentarios / Observaciones</label>
+                     <textarea value={formData.comments} onChange={e => setFormData({...formData, comments: e.target.value})} className="w-full mt-1 bg-slate-900 border border-orange-500/30 rounded-xl p-3 text-white focus:border-orange-500 outline-none min-h-[80px]" placeholder="Información adicional relevante..." />
+                  </div>
              </div>
           </div>
 

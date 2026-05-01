@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { useAppStore, type Player } from '../store/useAppStore';
-import { Swords, Shield, Trophy, RotateCcw, Save } from 'lucide-react';
+import { Shield, Trophy, RotateCcw } from 'lucide-react';
+import { CrossedSticks } from '../components/CrossedSticks';
 
 export const TrainingPage = () => {
   const allPlayers = useAppStore(state => state.players);
   const players = useMemo(() => allPlayers.filter(p => p.isActive), [allPlayers]);
-  const saveTraining = useAppStore(state => state.saveTraining);
-
+  
   const activeTraining = useAppStore(state => state.activeTraining);
   const setActiveTraining = useAppStore(state => state.setActiveTraining);
   const clearActiveTraining = useAppStore(state => state.clearActiveTraining);
@@ -31,25 +31,17 @@ export const TrainingPage = () => {
     if (team === 'B') setActiveTraining({ teamB: activeTraining.teamB.filter(id => id !== p.id) });
   };
 
-  const handleFinish = () => {
-    if (teamA.length === 0 && teamB.length === 0) return;
-    saveTraining({
-      date: Date.now(),
-      teamAScore: scoreA,
-      teamBScore: scoreB,
-      teamA_PlayerIds: activeTraining.teamA,
-      teamB_PlayerIds: activeTraining.teamB
-    });
-    // Reset
-    clearActiveTraining();
-    alert('¡Entrenamiento Registrado en la Base de Datos!');
+  const handleClear = () => {
+    if (window.confirm('¿Deseas reiniciar la pizarra de entrenamiento?')) {
+      clearActiveTraining();
+    }
   };
 
   return (
     <div className="min-h-screen pb-32 font-sans px-4">
       <div className="mb-4 pt-6 pb-2">
          <h1 className="text-3xl font-black text-white uppercase tracking-tight flex items-center gap-2">
-           <Swords className="text-primary"/> Draft & Práctica
+           <CrossedSticks className="text-primary"/> Draft & Práctica
          </h1>
          <p className="text-white/70 text-sm font-medium">Arma los equipos y registra el marcador</p>
       </div>
@@ -137,10 +129,10 @@ export const TrainingPage = () => {
       </div>
 
       <button 
-        onClick={handleFinish}
-        className="w-full mt-8 bg-primary text-background font-black uppercase rounded-2xl py-4 shadow-[0_0_20px_rgba(253,224,71,0.2)] active:scale-[0.98] flex justify-center items-center gap-2"
+        onClick={handleClear}
+        className="w-full mt-8 bg-white/5 text-white/50 font-black uppercase rounded-2xl py-4 border border-white/10 active:scale-[0.98] flex justify-center items-center gap-2"
       >
-        <Save size={20}/> Guardar Entrenamiento
+        <RotateCcw size={20}/> Reiniciar Pizarra
       </button>
 
     </div>

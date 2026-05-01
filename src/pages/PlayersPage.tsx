@@ -157,6 +157,14 @@ const PlayerEditor = ({ player, onClose }: { player: any, onClose: () => void })
             <label className="text-[10px] font-bold text-orange-200/50 uppercase">Alergias</label>
             <input type="text" value={formData.allergies} onChange={e => setFormData({...formData, allergies: e.target.value})} className="w-full bg-white text-black font-bold border-0 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-orange-500 outline-none" />
          </div>
+         <div>
+            <label className="text-[10px] font-bold text-orange-200/50 uppercase">Remedios de Base</label>
+            <input type="text" value={formData.regularMedications || ''} onChange={e => setFormData({...formData, regularMedications: e.target.value})} className="w-full bg-white text-black font-bold border-0 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-orange-500 outline-none" />
+         </div>
+         <div>
+            <label className="text-[10px] font-bold text-orange-200/50 uppercase">Comentarios / Observaciones</label>
+            <textarea value={formData.comments || ''} onChange={e => setFormData({...formData, comments: e.target.value})} className="w-full bg-white text-black font-bold border-0 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-orange-500 outline-none min-h-[60px]" />
+         </div>
          <div className="grid grid-cols-2 gap-2">
            <div>
               <label className="text-[10px] font-bold text-orange-200/50 uppercase">Contacto</label>

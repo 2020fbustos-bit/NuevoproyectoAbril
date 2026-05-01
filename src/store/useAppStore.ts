@@ -26,6 +26,8 @@ export type Player = {
   emergencyContactPhone: string;
   allergies: string;
   preferredClinic: string;
+  regularMedications: string;
+  comments: string;
   trainingDays: string[];
   isActive: boolean;
   activationDate?: string;

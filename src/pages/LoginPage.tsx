@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
-import { Shield, Lock, Mail, AlertTriangle } from 'lucide-react';
+import { Shield, Lock, Mail, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 
 export const LoginPage = () => {
   const login = useAppStore(state => state.login);
@@ -8,6 +8,7 @@ export const LoginPage = () => {
 
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
+  const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
@@ -55,12 +56,19 @@ export const LoginPage = () => {
            <div className="relative">
              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={20} />
              <input 
-               type="password" 
+               type={showPass ? "text" : "password"}
                value={pass}
                onChange={(e) => setPass(e.target.value)}
                placeholder="Contraseña"
-               className="w-full bg-surface border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white font-medium focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-white/30"
+               className="w-full bg-surface border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white font-medium focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-white/30"
              />
+             <button
+               type="button"
+               onClick={() => setShowPass(!showPass)}
+               className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+             >
+               {showPass ? <EyeOff size={20} /> : <Eye size={20} />}
+             </button>
            </div>
 
            <button 
@@ -71,10 +79,6 @@ export const LoginPage = () => {
              Ingresar
            </button>
          </form>
-
-         <p className="text-white/40 text-xs mt-12 text-center">
-            Para pruebas Admin usa:<br/>admin / admin123
-         </p>
        </div>
     </div>
   );
